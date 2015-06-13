@@ -12,6 +12,13 @@
 #import "RevealScriptHeader.h"
 #import "RevealIDEModel.h"
 
+
+typedef enum : NSUInteger {
+  InspectToolTypeReveal,
+  InspectToolTypeSpark,
+} InspectToolType;
+
+
 @interface RevealPlugin ()
 
 @property (nonatomic, assign) BOOL isRevealed;
@@ -19,8 +26,14 @@
 @property (nonatomic, assign) BOOL isInspected;
 
 @property (nonatomic, strong) NSMenuItem *revealItem;
-@property (nonatomic, strong) NSMenuItem *attachItem;
-@property (nonatomic, strong) NSString *dyLibPath;
+@property (nonatomic, strong) NSMenuItem *attachRevealItem;
+@property (nonatomic, strong) NSString *revealDyLibPath;
+
+@property (nonatomic, strong) NSMenuItem *sparkItem;
+@property (nonatomic, strong) NSMenuItem *attachSparkItem;
+@property (nonatomic, strong) NSString *sparkDyLibPath;
+
+@property (nonatomic) InspectToolType currentSelectedInspectType;
 
 @end
 
@@ -76,7 +89,6 @@
     NSMenuItem *analyzeItem = [productMenuItem.submenu itemWithTitle:@"Analyze"];
     NSInteger revealIndex = [menu indexOfItem:analyzeItem] + 1;
 
-//    [[productMenuItem submenu] addItem:[NSMenuItem separatorItem]];
     NSMenuItem *revealItem = [[NSMenuItem alloc] initWithTitle:@"Inspect with Reveal"
                                                         action:@selector(didPressRevealInspectProductMenu:)
                                                  keyEquivalent:@"p"];
@@ -85,6 +97,17 @@
     [[productMenuItem submenu] insertItem:revealItem atIndex:revealIndex];
     
     self.revealItem = revealItem;
+    
+    
+    NSInteger sparkIndex = [menu indexOfItem:revealItem] + 1;
+    NSMenuItem *sparkItem = [[NSMenuItem alloc] initWithTitle:@"Inspect with Spark"
+                                                        action:@selector(didPressSparkInspectProductMenu:)
+                                                 keyEquivalent:@"s"];
+    [sparkItem setTarget:self];
+    [sparkItem setKeyEquivalentModifierMask:NSControlKeyMask|NSCommandKeyMask];
+    [[productMenuItem submenu] insertItem:sparkItem atIndex:sparkIndex];
+    
+    self.sparkItem = sparkItem;
   }
 
   NSMenuItem *debugMenuItem = [[NSApp mainMenu] itemWithTitle:@"Debug"];
@@ -98,7 +121,19 @@
     
     [revealItem.menu setAutoenablesItems:NO];
     [revealItem setEnabled:NO];
-    self.attachItem = revealItem;
+    self.attachRevealItem = revealItem;
+    
+    
+    NSMenuItem *sparkItem = [[NSMenuItem alloc] initWithTitle:@"Attach to Spark"
+                                                        action:@selector(didPressSparkInspectDebugMenu:)
+                                                 keyEquivalent:@"'"];
+    [sparkItem setTarget:self];
+    [sparkItem setKeyEquivalentModifierMask:NSControlKeyMask|NSCommandKeyMask];
+    [[debugMenuItem submenu] addItem:sparkItem];
+    
+    [sparkItem.menu setAutoenablesItems:NO];
+    [sparkItem setEnabled:NO];
+    self.attachSparkItem = sparkItem;
   }
 }
 
@@ -137,11 +172,12 @@
     NSLog(@"Debug state change...");
     if (self.isPreparedForLaunch) {
       NSLog(@"isPreparedForLaunch...");
-      [self.attachItem setEnabled:YES];
+      [self.attachRevealItem setEnabled:YES];
+      [self.attachSparkItem setEnabled:YES];
       
       if (self.isRevealed) {
         self.isRevealed = NO;
-        [self attachToLLDB];
+        [self attachToLLDBWithInspectToolType:self.currentSelectedInspectType];
       }
     }
     self.isPreparedForLaunch = NO;
@@ -151,7 +187,8 @@
   if ([[notif name] isEqualToString:@"CurrentExecutionTrackerCompletedNotification"]) {
     // Reviced no matter how it is stoped.
     NSLog(@"Finished.");
-    [self.attachItem setEnabled:NO];
+    [self.attachRevealItem setEnabled:NO];
+    [self.attachSparkItem setEnabled:NO];
     self.isPreparedForLaunch = NO;
   }
 }
@@ -168,9 +205,24 @@
  */
 - (void)didPressRevealInspectProductMenu:(NSMenuItem *)sender
 {
-  NSLog(@"Reveal didPressRevealInspectProductMenu:%@", sender);
+  NSLog(@"InspectTool didPressRevealInspectProductMenu:%@", sender);
 
   self.isRevealed = YES;
+  self.currentSelectedInspectType = InspectToolTypeReveal;
+  
+  NSMenuItem *productMenuItem = [[NSApp mainMenu] itemWithTitle:@"Product"];
+  if (productMenuItem) {
+    NSMenuItem *runItem = [productMenuItem.submenu itemWithTitle:@"Run"];
+    [self performActionForMenuItem:runItem];
+  }
+}
+
+- (void)didPressSparkInspectProductMenu:(NSMenuItem*)sender
+{
+  NSLog(@"InspectTool didPressSparkInspectProductMenu:%@", sender);
+  
+  self.isRevealed = YES;
+  self.currentSelectedInspectType = InspectToolTypeSpark;
   
   NSMenuItem *productMenuItem = [[NSApp mainMenu] itemWithTitle:@"Product"];
   if (productMenuItem) {
@@ -181,9 +233,20 @@
 
 - (void)didPressRevealInspectDebugMenu:(NSMenuItem *)sender
 {
-  NSLog(@"Reveal didPressRevealInspectDebugMenu(Attach to Reveal):%@", sender);
+  NSLog(@"InspectTool didPressRevealInspectDebugMenu(Attach to Reveal):%@", sender);
+  
+  self.currentSelectedInspectType = InspectToolTypeReveal;
 
-  [self attachToLLDB];
+  [self attachToLLDBWithInspectToolType:InspectToolTypeReveal];
+}
+
+- (void)didPressSparkInspectDebugMenu:(NSMenuItem *)sender
+{
+  NSLog(@"InspectTool didPressSparkInspectDebugMenu(Attach to Spark):%@", sender);
+  
+  self.currentSelectedInspectType = InspectToolTypeSpark;
+  
+  [self attachToLLDBWithInspectToolType:InspectToolTypeSpark];
 }
 
 #pragma mark -
@@ -198,57 +261,119 @@
 
 #pragma mark - attach to lldb
 
-- (void)attachToLLDB
+- (void)attachToLLDBWithInspectToolType:(InspectToolType)aType
 {
   if (!self.isInspected) {
     NSLog(@"AttachToLLDB starting");
     self.isInspected = YES;
-    [self.attachItem setEnabled:NO];
+    [self.attachRevealItem setEnabled:NO];
+    [self.attachSparkItem setEnabled:NO];
   } else {
-    [self.attachItem setEnabled:NO];
+    [self.attachRevealItem setEnabled:NO];
+    [self.attachSparkItem setEnabled:NO];
     NSLog(@"AttachToLLDB already started");
     return;
   }
   
   // do pause execution in and then attach
   // check the dylib exist, if not, alert
-  if (![self checkRevealDylib]) {
+  if (![self checkRevealDylibWithInspectToolType:aType]) {
     NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText:@"The Reveal dynamic library does not exist. Please download the latest copy of the Reveal and replace the old version at http://revealapp.com."];
+    [alert setMessageText:@"The dynamic library does not exist"];
     [alert runModal];
     
     self.isInspected = NO;
     return;
   }
   
-  [self pauseExecutionIn];
+  [self pauseExecutionInWithInspectToolType:aType];
   
   self.isInspected = NO;
 }
 
 #pragma mark - private
 
-- (BOOL)checkRevealDylib
+- (BOOL)checkRevealDylibWithInspectToolType:(InspectToolType)aType
 {
-  NSString *dylibPath1 = @"/Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/libReveal.dylib";
-  NSString *dylibPath2 = [@"~/Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/libReveal.dylib" stringByResolvingSymlinksInPath];
-
-  if ([[NSFileManager defaultManager] fileExistsAtPath:dylibPath1]) {
-    self.dyLibPath = dylibPath1;
-    return YES;
-  } else if ([[NSFileManager defaultManager] fileExistsAtPath:dylibPath2]) {
-    self.dyLibPath = dylibPath2;
-    return YES;
-  } else {
-    return NO;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    NSString *dylibPath1 = nil;
+    NSString *dylibPath2 = nil;
+    
+    dylibPath1 = @"/Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/libReveal.dylib";
+    dylibPath2 = [@"~/Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/libReveal.dylib" stringByResolvingSymlinksInPath];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:dylibPath1]) {
+      self.revealDyLibPath = dylibPath1;
+    } else if ([[NSFileManager defaultManager] fileExistsAtPath:dylibPath2]) {
+      self.revealDyLibPath = dylibPath2;
+    }
+    
+    dylibPath1 = @"/Applications/Spark Inspector.app/Contents/Resources/Frameworks/SparkInspector.dylib";
+    dylibPath2 = [@"~/Applications/Spark Inspector.app/Contents/Resources/Frameworks/SparkInspector.dylib" stringByResolvingSymlinksInPath];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:dylibPath1]) {
+      self.sparkDyLibPath = dylibPath1;
+    } else if ([[NSFileManager defaultManager] fileExistsAtPath:dylibPath2]) {
+      self.sparkDyLibPath = dylibPath2;
+    }
+  });
+  
+  switch (aType) {
+    case InspectToolTypeReveal:
+    {
+      if ([self.revealDyLibPath length]) {
+        return YES;
+      } else {
+        return NO;
+      }
+    }
+      break;
+      
+    case InspectToolTypeSpark:
+    {
+      if ([self.sparkDyLibPath length]) {
+        return YES;
+      } else {
+        return NO;
+      }
+    }
+      break;
+      
+    default:
+      return NO;
+      break;
   }
 }
 
-- (void)launchRevealApp
+- (NSString*)scriptForLaunchInspect:(InspectToolType)aType
+{
+  switch (aType) {
+    case InspectToolTypeReveal:
+    {
+      return @"tell application \"Reveal\" \n\
+      activate\n\
+      end tell";
+    }
+      break;
+      
+    case InspectToolTypeSpark:
+    {
+      return @"tell application \"Spark Inspector\" \n\
+      activate\n\
+      end tell";
+    }
+      break;
+      
+    default:
+      return nil;
+      break;
+  }
+}
+
+- (void)launchRevealAppWithInspectToolType:(InspectToolType)aType
 {
   // start applescript to launch Reveal
   NSString *scriptPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"rp.script"];
-  [kScriptLaunchReveal writeToFile:scriptPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+  [[self scriptForLaunchInspect:aType] writeToFile:scriptPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
   if ([scriptPath length] == 0)
     return;
   
@@ -271,7 +396,7 @@
   [as executeAndReturnError: NULL];
 }
 
-- (void)pauseExecutionIn
+- (void)pauseExecutionInWithInspectToolType:(InspectToolType)aType
 {
   DBGDebugSession *debugsession = [RevealIDEModel debugSessionIn];
   
@@ -288,19 +413,20 @@
           [alert setMessageText:@"An unexpected error occurred, please try again later!"];
           [alert runModal];
           
-          [self.attachItem setEnabled:YES];
+          [self.attachRevealItem setEnabled:YES];
+          [self.attachSparkItem setEnabled:YES];
           return;
         } else {
-          [self inspectWithReveal:debugsession];
+          [self inspectWithSession:debugsession inspectToolType:aType];
         }
       });
     });
   } else {
-    [self inspectWithReveal:debugsession];
+    [self inspectWithSession:debugsession inspectToolType:aType];
   }
 }
 
-- (void)inspectWithReveal:(DBGDebugSession *)debugsession
+- (void)inspectWithSession:(DBGDebugSession *)debugsession inspectToolType:(InspectToolType)aType
 {
   if ([debugsession respondsToSelector:@selector(requestPause)]) {
     objc_msgSend(debugsession, @selector(requestPause));
@@ -309,7 +435,25 @@
       IDEConsoleTextView *consoleView = [RevealIDEModel whenXcodeConsoleIn];
       NSString *consoleStr = objc_msgSend(consoleView, @selector(string));
       if (NSNotFound != [consoleStr rangeOfString:@"(lldb)" options:NSBackwardsSearch].location) {
-        NSString *loadDyLibExpression = [NSString stringWithFormat:@"expr (void*)dlopen(\"%@\", 0x2);", self.dyLibPath];
+        NSString *loadDyLibExpression = nil;
+        switch (aType) {
+          case InspectToolTypeReveal:
+          {
+            loadDyLibExpression = [NSString stringWithFormat:@"expr (void*)dlopen(\"%@\", 0x2);", self.revealDyLibPath];
+          }
+            break;
+            
+          case InspectToolTypeSpark:
+          {
+            loadDyLibExpression = [NSString stringWithFormat:@"expr (void*)dlopen(\"%@\", 0x2);", self.sparkDyLibPath];
+          }
+            break;
+            
+          default:
+            return ;
+            break;
+        }
+        
         objc_msgSend(consoleView, @selector(insertText:), loadDyLibExpression);
         objc_msgSend(consoleView, @selector(insertNewline:), nil);
         
@@ -319,7 +463,7 @@
         objc_msgSend(consoleView, @selector(insertText:), @"continue");
         objc_msgSend(consoleView, @selector(insertNewline:), nil);
         
-        [self launchRevealApp];
+        [self launchRevealAppWithInspectToolType:aType];
         NSLog(@"AttachToLLDB done!");
       } else {
         NSLog(@"(lldb) not found");
@@ -327,7 +471,8 @@
         [alert setMessageText:@"An unexpected error occurred, please try again later!"];
         [alert runModal];
         
-        [self.attachItem setEnabled:YES];
+        [self.attachRevealItem setEnabled:YES];
+        [self.attachSparkItem setEnabled:YES];
       }
     });
   } else {
@@ -336,7 +481,8 @@
     [alert setMessageText:@"An unexpected error occurred, please try again later!"];
     [alert runModal];
     
-    [self.attachItem setEnabled:YES];
+    [self.attachRevealItem setEnabled:YES];
+    [self.attachSparkItem setEnabled:YES];
     return;
   }
 }

@@ -20,9 +20,9 @@
 //activate\n\
 //end tell"
 
-#define kScriptLaunchReveal @"tell application \"Reveal\" \n\
-activate\n\
-end tell"
+//#define kScriptLaunchReveal @"tell application \"Reveal\" \n\
+//activate\n\
+//end tell"
 
 #define kScriptActiveXcode @"tell application \"Xcode\" \n\
 activate\n\
