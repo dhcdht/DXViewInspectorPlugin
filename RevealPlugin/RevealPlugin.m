@@ -119,8 +119,8 @@ typedef enum : NSUInteger {
     [revealItem setKeyEquivalentModifierMask:NSControlKeyMask|NSCommandKeyMask];
     [[debugMenuItem submenu] addItem:revealItem];
     
-    [revealItem.menu setAutoenablesItems:NO];
-    [revealItem setEnabled:NO];
+//    [revealItem.menu setAutoenablesItems:NO];
+//    [revealItem setEnabled:NO];
     self.attachRevealItem = revealItem;
     
     
@@ -131,8 +131,8 @@ typedef enum : NSUInteger {
     [sparkItem setKeyEquivalentModifierMask:NSControlKeyMask|NSCommandKeyMask];
     [[debugMenuItem submenu] addItem:sparkItem];
     
-    [sparkItem.menu setAutoenablesItems:NO];
-    [sparkItem setEnabled:NO];
+//    [sparkItem.menu setAutoenablesItems:NO];
+//    [sparkItem setEnabled:NO];
     self.attachSparkItem = sparkItem;
   }
 }
@@ -172,8 +172,8 @@ typedef enum : NSUInteger {
     NSLog(@"Debug state change...");
     if (self.isPreparedForLaunch) {
       NSLog(@"isPreparedForLaunch...");
-      [self.attachRevealItem setEnabled:YES];
-      [self.attachSparkItem setEnabled:YES];
+//      [self.attachRevealItem setEnabled:YES];
+//      [self.attachSparkItem setEnabled:YES];
       
       if (self.isRevealed) {
         self.isRevealed = NO;
@@ -187,8 +187,8 @@ typedef enum : NSUInteger {
   if ([[notif name] isEqualToString:@"CurrentExecutionTrackerCompletedNotification"]) {
     // Reviced no matter how it is stoped.
     NSLog(@"Finished.");
-    [self.attachRevealItem setEnabled:NO];
-    [self.attachSparkItem setEnabled:NO];
+//    [self.attachRevealItem setEnabled:NO];
+//    [self.attachSparkItem setEnabled:NO];
     self.isPreparedForLaunch = NO;
   }
 }
@@ -266,11 +266,11 @@ typedef enum : NSUInteger {
   if (!self.isInspected) {
     NSLog(@"AttachToLLDB starting");
     self.isInspected = YES;
-    [self.attachRevealItem setEnabled:NO];
-    [self.attachSparkItem setEnabled:NO];
+//    [self.attachRevealItem setEnabled:NO];
+//    [self.attachSparkItem setEnabled:NO];
   } else {
-    [self.attachRevealItem setEnabled:NO];
-    [self.attachSparkItem setEnabled:NO];
+//    [self.attachRevealItem setEnabled:NO];
+//    [self.attachSparkItem setEnabled:NO];
     NSLog(@"AttachToLLDB already started");
     return;
   }
@@ -413,8 +413,8 @@ typedef enum : NSUInteger {
           [alert setMessageText:@"An unexpected error occurred, please try again later!"];
           [alert runModal];
           
-          [self.attachRevealItem setEnabled:YES];
-          [self.attachSparkItem setEnabled:YES];
+//          [self.attachRevealItem setEnabled:YES];
+//          [self.attachSparkItem setEnabled:YES];
           return;
         } else {
           [self inspectWithSession:debugsession inspectToolType:aType];
@@ -471,8 +471,8 @@ typedef enum : NSUInteger {
         [alert setMessageText:@"An unexpected error occurred, please try again later!"];
         [alert runModal];
         
-        [self.attachRevealItem setEnabled:YES];
-        [self.attachSparkItem setEnabled:YES];
+//        [self.attachRevealItem setEnabled:YES];
+//        [self.attachSparkItem setEnabled:YES];
       }
     });
   } else {
@@ -481,8 +481,8 @@ typedef enum : NSUInteger {
     [alert setMessageText:@"An unexpected error occurred, please try again later!"];
     [alert runModal];
     
-    [self.attachRevealItem setEnabled:YES];
-    [self.attachSparkItem setEnabled:YES];
+//    [self.attachRevealItem setEnabled:YES];
+//    [self.attachSparkItem setEnabled:YES];
     return;
   }
 }
