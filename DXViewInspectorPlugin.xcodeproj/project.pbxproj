@@ -19,11 +19,11 @@
 		0C4AC3B54C1C4664BF51AC76 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A05281C818EEBB5700F54910 /* RevealIDEModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RevealIDEModel.h; sourceTree = "<group>"; };
 		A05281C918EEBB5700F54910 /* RevealIDEModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RevealIDEModel.m; sourceTree = "<group>"; };
-		A06A7E5A18E40D9C0039BB1B /* RevealPlugin.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RevealPlugin.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		A06A7E5A18E40D9C0039BB1B /* DXViewInspectorPlugin.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DXViewInspectorPlugin.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		A06A7E5D18E40D9C0039BB1B /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
-		A06A7E6118E40D9C0039BB1B /* RevealPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RevealPlugin-Info.plist"; sourceTree = "<group>"; };
+		A06A7E6118E40D9C0039BB1B /* DXViewInspectorPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DXViewInspectorPlugin-Info.plist"; sourceTree = "<group>"; };
 		A06A7E6318E40D9C0039BB1B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A06A7E6518E40D9C0039BB1B /* RevealPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RevealPlugin-Prefix.pch"; sourceTree = "<group>"; };
+		A06A7E6518E40D9C0039BB1B /* DXViewInspectorPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DXViewInspectorPlugin-Prefix.pch"; sourceTree = "<group>"; };
 		A06A7E6B18E412520039BB1B /* RevealPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RevealPlugin.h; sourceTree = "<group>"; };
 		A06A7E6C18E412520039BB1B /* RevealPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RevealPlugin.m; sourceTree = "<group>"; };
 		A09434AB18F2E15900AE246C /* NSView+SQDump.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+SQDump.h"; sourceTree = "<group>"; };
@@ -65,7 +65,7 @@
 		A06A7E5B18E40D9C0039BB1B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A06A7E5A18E40D9C0039BB1B /* RevealPlugin.xcplugin */,
+				A06A7E5A18E40D9C0039BB1B /* DXViewInspectorPlugin.xcplugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,9 +96,9 @@
 		A06A7E6018E40D9C0039BB1B /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				A06A7E6118E40D9C0039BB1B /* RevealPlugin-Info.plist */,
+				A06A7E6118E40D9C0039BB1B /* DXViewInspectorPlugin-Info.plist */,
 				A06A7E6218E40D9C0039BB1B /* InfoPlist.strings */,
-				A06A7E6518E40D9C0039BB1B /* RevealPlugin-Prefix.pch */,
+				A06A7E6518E40D9C0039BB1B /* DXViewInspectorPlugin-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -117,9 +117,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A06A7E5918E40D9C0039BB1B /* RevealPlugin */ = {
+		A06A7E5918E40D9C0039BB1B /* DXViewInspectorPlugin */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A06A7E6818E40D9C0039BB1B /* Build configuration list for PBXNativeTarget "RevealPlugin" */;
+			buildConfigurationList = A06A7E6818E40D9C0039BB1B /* Build configuration list for PBXNativeTarget "DXViewInspectorPlugin" */;
 			buildPhases = (
 				A06A7E5618E40D9C0039BB1B /* Sources */,
 				A06A7E5718E40D9C0039BB1B /* Frameworks */,
@@ -129,9 +129,9 @@
 			);
 			dependencies = (
 			);
-			name = RevealPlugin;
+			name = DXViewInspectorPlugin;
 			productName = RevealPlugin;
-			productReference = A06A7E5A18E40D9C0039BB1B /* RevealPlugin.xcplugin */;
+			productReference = A06A7E5A18E40D9C0039BB1B /* DXViewInspectorPlugin.xcplugin */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -143,7 +143,7 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Saick;
 			};
-			buildConfigurationList = A06A7E5518E40D9C0039BB1B /* Build configuration list for PBXProject "RevealPlugin" */;
+			buildConfigurationList = A06A7E5518E40D9C0039BB1B /* Build configuration list for PBXProject "DXViewInspectorPlugin" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -155,7 +155,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A06A7E5918E40D9C0039BB1B /* RevealPlugin */,
+				A06A7E5918E40D9C0039BB1B /* DXViewInspectorPlugin */,
 			);
 		};
 /* End PBXProject section */
@@ -279,14 +279,14 @@
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RevealPlugin/RevealPlugin-Prefix.pch";
+				GCC_PREFIX_HEADER = "RevealPlugin/DXViewInspectorPlugin-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				INFOPLIST_FILE = "RevealPlugin/RevealPlugin-Info.plist";
+				INFOPLIST_FILE = "RevealPlugin/DXViewInspectorPlugin-Info.plist";
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = DXViewInspectorPlugin;
 				WRAPPER_EXTENSION = xcplugin;
 			};
 			name = Debug;
@@ -303,14 +303,14 @@
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RevealPlugin/RevealPlugin-Prefix.pch";
+				GCC_PREFIX_HEADER = "RevealPlugin/DXViewInspectorPlugin-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				INFOPLIST_FILE = "RevealPlugin/RevealPlugin-Info.plist";
+				INFOPLIST_FILE = "RevealPlugin/DXViewInspectorPlugin-Info.plist";
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = DXViewInspectorPlugin;
 				WRAPPER_EXTENSION = xcplugin;
 			};
 			name = Release;
@@ -318,7 +318,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A06A7E5518E40D9C0039BB1B /* Build configuration list for PBXProject "RevealPlugin" */ = {
+		A06A7E5518E40D9C0039BB1B /* Build configuration list for PBXProject "DXViewInspectorPlugin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A06A7E6618E40D9C0039BB1B /* Debug */,
@@ -327,7 +327,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A06A7E6818E40D9C0039BB1B /* Build configuration list for PBXNativeTarget "RevealPlugin" */ = {
+		A06A7E6818E40D9C0039BB1B /* Build configuration list for PBXNativeTarget "DXViewInspectorPlugin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A06A7E6918E40D9C0039BB1B /* Debug */,
