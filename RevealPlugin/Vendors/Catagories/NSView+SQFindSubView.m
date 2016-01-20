@@ -12,20 +12,20 @@
 
 - (NSView *)findSubView:(Class)cls
 {
-  if ([[self subviews] count] > 0) {
-    for (NSView *subview in [self subviews]) {
-//      NSLog(@"%@", NSStringFromClass([subview class]));
-      if ([subview isKindOfClass:cls]) {
-        return subview;
-      } else {
-        NSView *foundView = [subview findSubView:cls];
-        if (foundView != nil)
-          return foundView;
-      }
+    if ([[self subviews] count] > 0) {
+        for (NSView *subview in [self subviews]) {
+            //      NSLog(@"%@", NSStringFromClass([subview class]));
+            if ([subview isKindOfClass:cls]) {
+                return subview;
+            } else {
+                NSView *foundView = [subview findSubView:cls];
+                if (foundView != nil)
+                    return foundView;
+            }
+        }
     }
-  }
-  
-  return nil;
+    
+    return nil;
 }
 
 @end
